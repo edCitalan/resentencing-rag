@@ -1,4 +1,3 @@
 streamlit
 python-dotenv
-pinecone
-pinecone-plugin-assistant
+pinecone>=5.0.0

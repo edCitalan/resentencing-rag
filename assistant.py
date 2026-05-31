@@ -2,7 +2,6 @@ import os
 
 from dotenv import load_dotenv
 from pinecone import Pinecone
-from pinecone_plugins.assistant.models.chat import Message
 
 load_dotenv()
 
@@ -40,6 +39,6 @@ def get_assistant():
 
 def chat(prompt: str) -> str:
     assistant = get_assistant()
-    resp = assistant.chat(messages=[Message(content=prompt)])
-    return resp["message"]["content"]
+    resp = assistant.chat(messages=[{"role": "user", "content": prompt}])
+    return resp.message.content
 
