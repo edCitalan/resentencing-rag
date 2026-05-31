@@ -34,7 +34,7 @@ def get_assistant():
     if not api_key:
         raise RuntimeError("Missing PINECONE_API_KEY (env var or Streamlit secret)")
     pc = Pinecone(api_key=api_key)
-    return pc.assistant.Assistant(assistant_name="reg")
+    return pc.assistant.assistant(assistant_name="reg")
 
 
 def chat(prompt: str) -> str:
