@@ -1,7 +1,7 @@
 import os
 
+import requests
 from dotenv import load_dotenv
-from pinecone import Pinecone
 
 load_dotenv()
 
@@ -10,12 +10,10 @@ try:
 except Exception:
     st = None
 
+_CHAT_URL = "https://prod-1-data.ke.pinecone.io/assistant/chat/reg"
+
 
 def _get_setting(key: str, default: str = "") -> str:
-    """
-    Prefer real environment variables; fall back to Streamlit secrets.
-    This supports local .env, PythonAnywhere, Docker, and Streamlit Community Cloud.
-    """
     value = os.environ.get(key)
     if value is not None and str(value).strip() != "":
         return str(value)
@@ -29,16 +27,15 @@ def _get_setting(key: str, default: str = "") -> str:
     return default
 
 
-def get_assistant():
+def chat(prompt: str) -> str:
     api_key = _get_setting("PINECONE_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError("Missing PINECONE_API_KEY (env var or Streamlit secret)")
-    pc = Pinecone(api_key=api_key)
-    return pc.assistant.assistant(assistant_name="reg")
-
-
-def chat(prompt: str) -> str:
-    assistant = get_assistant()
-    resp = assistant.chat(messages=[{"role": "user", "content": prompt}])
-    return resp.message.content
-
+    resp = requests.post(
+        _CHAT_URL,
+        headers={"Api-Key": api_key, "Content-Type": "application/json"},
+        json={"messages": [{"role": "user", "content": prompt}]},
+        timeout=60,
+    )
+    resp.raise_for_status()
+    return resp.json()["message"]["content"]
